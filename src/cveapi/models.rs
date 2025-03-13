@@ -97,7 +97,7 @@ pub fn categorize_vulnerability(vuln_id: &str) -> String {
 }
 
 /// Determine the attack vector based on service and banner
-pub fn determine_attack_vector(service: &str, banner: &str) -> String {
+pub fn determine_attack_vector(service: &str, _banner: &str) -> String {
     // This is a simplified implementation that could be expanded
     if service.contains("http") || service.contains("web") {
         "Web".to_string()

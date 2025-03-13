@@ -3,7 +3,6 @@
 use std::error::Error;
 use crate::models::{Vulnerability, ScanConfig};
 use crate::plugins::VulnerabilityDetectorPlugin;
-use crate::cveapi;
 
 pub struct CirclDetectorPlugin {
     enabled: bool,
@@ -35,8 +34,8 @@ impl VulnerabilityDetectorPlugin for CirclDetectorPlugin {
     }
     
     fn detect_vulnerabilities(&self, 
-                             service: &str, 
-                             banner: &str, 
+                             _service: &str, 
+                             _banner: &str, 
                              config: &ScanConfig) -> Result<Vec<Vulnerability>, Box<dyn Error>> {
         // If offline mode is enabled, don't perform CIRCL lookups
         if config.offline_mode {
@@ -49,12 +48,12 @@ impl VulnerabilityDetectorPlugin for CirclDetectorPlugin {
     }
     
     fn lookup_vulnerability(&self, 
-                           identifier: &str) -> Result<Option<Vulnerability>, Box<dyn Error>> {
+                           _identifier: &str) -> Result<Option<Vulnerability>, Box<dyn Error>> {
         // This will require implementation of a CIRCL API-specific lookup
         // For now, we can create a placeholder that will be implemented later
         
         // Only process if it's a CVE identifier
-        if !identifier.starts_with("CVE-") {
+        if !_identifier.starts_with("CVE-") {
             return Ok(None);
         }
         

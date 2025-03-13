@@ -37,14 +37,14 @@ impl VulnerabilityDetectorPlugin for PatternMatchingPlugin {
     fn detect_vulnerabilities(&self, 
                              service: &str, 
                              banner: &str, 
-                             config: &ScanConfig) -> Result<Vec<Vulnerability>, Box<dyn Error>> {
+                             _config: &ScanConfig) -> Result<Vec<Vulnerability>, Box<dyn Error>> {
         // This uses the existing offline vulnerability pattern matching
         let vulnerabilities = cveapi::match_offline_vulnerabilities(service, banner);
         Ok(vulnerabilities)
     }
     
     fn lookup_vulnerability(&self, 
-                           identifier: &str) -> Result<Option<Vulnerability>, Box<dyn Error>> {
+                           _identifier: &str) -> Result<Option<Vulnerability>, Box<dyn Error>> {
         // Pattern matching is not designed for direct vulnerability lookups
         // It works on service banners, not vulnerability IDs
         Ok(None)

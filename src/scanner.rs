@@ -100,27 +100,25 @@ fn scan_host(ip: &IpAddr, config: &ScanConfig) -> ScanResult {
             // Identify service
             let service = utils::identify_service(*port, &banner);
             
-            // Check for vulnerabilities using plugin system
-            let mut vulnerabilities = Vec::new();
-            
             // Create plugin registry
             let plugin_registry = PluginRegistry::new();
             
-            // If enhanced vulnerability detection is enabled, use all plugins
-            if config.enhanced_vuln_detection {
-                vulnerabilities = plugin_registry.detect_vulnerabilities(
+            // Detect vulnerabilities using the appropriate method based on configuration
+            let vulnerabilities = if config.enhanced_vuln_detection {
+                // If enhanced vulnerability detection is enabled, use all plugins
+                plugin_registry.detect_vulnerabilities(
                     &service,
                     &banner,
                     config
-                );
+                )
             } else {
                 // Otherwise use the legacy approach for backward compatibility
-                vulnerabilities = cveapi::check_service_vulnerabilities(
+                cveapi::check_service_vulnerabilities(
                     &service, 
                     &banner, 
                     !config.offline_mode
-                );
-            }
+                )
+            };
             
             // Create port result
             let port_result = PortResult {
@@ -171,7 +169,7 @@ fn scan_host(ip: &IpAddr, config: &ScanConfig) -> ScanResult {
             .collect();
             
         if !all_vulnerabilities.is_empty() {
-            // Use the attack path generator
+            // Use the attack path generator to get properly formatted attack paths
             Some(cveapi::generate_attack_paths(&all_vulnerabilities))
         } else {
             None

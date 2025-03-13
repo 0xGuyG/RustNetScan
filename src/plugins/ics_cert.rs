@@ -47,7 +47,7 @@ impl VulnerabilityDetectorPlugin for IcsCertDetectorPlugin {
     
     fn detect_vulnerabilities(&self, 
                              service: &str, 
-                             banner: &str, 
+                             _banner: &str, 
                              config: &ScanConfig) -> Result<Vec<Vulnerability>, Box<dyn Error>> {
         // Skip if not an ICS service or if offline mode is enabled
         if !self.is_ics_service(service) || config.offline_mode {

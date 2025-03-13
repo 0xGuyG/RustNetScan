@@ -280,6 +280,7 @@ pub fn lookup_vulnerability_nvd(client: &Client, cve_id: &str) -> Result<Option<
 /// Data structures for CIRCL CVE API response
 #[derive(Deserialize)]
 struct CirclCveResponse {
+    #[allow(dead_code)]
     id: String,
     summary: Option<String>,
     references: Option<Vec<String>>,

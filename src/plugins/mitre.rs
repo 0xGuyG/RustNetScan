@@ -35,23 +35,23 @@ impl VulnerabilityDetectorPlugin for MitreAttackPlugin {
     }
     
     fn detect_vulnerabilities(&self, 
-                             service: &str, 
-                             banner: &str, 
-                             config: &ScanConfig) -> Result<Vec<Vulnerability>, Box<dyn Error>> {
+                             _service: &str, 
+                             _banner: &str, 
+                             _config: &ScanConfig) -> Result<Vec<Vulnerability>, Box<dyn Error>> {
         // This plugin doesn't directly detect vulnerabilities
         // Instead, it enriches existing vulnerabilities with MITRE ATT&CK information
         Ok(Vec::new())
     }
     
     fn lookup_vulnerability(&self, 
-                           identifier: &str) -> Result<Option<Vulnerability>, Box<dyn Error>> {
+                           _identifier: &str) -> Result<Option<Vulnerability>, Box<dyn Error>> {
         // Only process CVE identifiers
-        if !identifier.starts_with("CVE-") {
+        if !_identifier.starts_with("CVE-") {
             return Ok(None);
         }
         
         // Try to look up the vulnerability through other means first
-        if let Ok(Some(mut vuln)) = cveapi::lookup_vulnerability(identifier) {
+        if let Ok(Some(mut vuln)) = cveapi::lookup_vulnerability(_identifier) {
             // If the vulnerability exists, enrich it with MITRE ATT&CK information
             if vuln.mitre_tactics.is_none() || vuln.mitre_techniques.is_none() {
                 if let Ok((tactics, techniques)) = cveapi::map_to_mitre_attack(&vuln.id) {

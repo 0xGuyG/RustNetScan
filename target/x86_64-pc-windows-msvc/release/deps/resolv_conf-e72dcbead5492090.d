@@ -1,0 +1,10 @@
+/Users/guygandelman/Documents/GitHub/RustNetScan/target/x86_64-pc-windows-msvc/release/deps/libresolv_conf-e72dcbead5492090.rmeta: /Users/guygandelman/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/resolv-conf-0.7.0/src/lib.rs /Users/guygandelman/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/resolv-conf-0.7.0/src/grammar.rs /Users/guygandelman/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/resolv-conf-0.7.0/src/ip.rs /Users/guygandelman/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/resolv-conf-0.7.0/src/config.rs
+
+/Users/guygandelman/Documents/GitHub/RustNetScan/target/x86_64-pc-windows-msvc/release/deps/libresolv_conf-e72dcbead5492090.rlib: /Users/guygandelman/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/resolv-conf-0.7.0/src/lib.rs /Users/guygandelman/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/resolv-conf-0.7.0/src/grammar.rs /Users/guygandelman/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/resolv-conf-0.7.0/src/ip.rs /Users/guygandelman/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/resolv-conf-0.7.0/src/config.rs
+
+/Users/guygandelman/Documents/GitHub/RustNetScan/target/x86_64-pc-windows-msvc/release/deps/resolv_conf-e72dcbead5492090.d: /Users/guygandelman/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/resolv-conf-0.7.0/src/lib.rs /Users/guygandelman/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/resolv-conf-0.7.0/src/grammar.rs /Users/guygandelman/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/resolv-conf-0.7.0/src/ip.rs /Users/guygandelman/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/resolv-conf-0.7.0/src/config.rs
+
+/Users/guygandelman/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/resolv-conf-0.7.0/src/lib.rs:
+/Users/guygandelman/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/resolv-conf-0.7.0/src/grammar.rs:
+/Users/guygandelman/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/resolv-conf-0.7.0/src/ip.rs:
+/Users/guygandelman/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/resolv-conf-0.7.0/src/config.rs:

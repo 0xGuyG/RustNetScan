@@ -59,19 +59,19 @@ pub fn match_offline_vulnerabilities(service: &str, banner: &str) -> Vec<Vulnera
     let mut results = Vec::new();
     
     // Check against our predefined vulnerability patterns
-    for pattern in VULNERABILITY_PATTERNS {
-        if let Ok(regex) = Regex::new(pattern.regex) {
+    for pattern in VULNERABILITY_PATTERNS.iter() {
+        if let Ok(regex) = Regex::new(pattern.1.as_str()) {
             if regex.is_match(banner) {
                 let vuln = create_full_vulnerability(
-                    pattern.id.to_string(),
-                    pattern.description.to_string(),
-                    Some(pattern.severity.to_string()),
-                    Some(pattern.cvss_score),
-                    Some(vec![pattern.reference.to_string()]),
-                    Some(pattern.actively_exploited),
+                    pattern.2.clone(), // vulnerability_id
+                    pattern.3.clone(), // vulnerability_description
+                    Some("MEDIUM".to_string()), // Default severity
+                    Some(5.0), // Default CVSS score
+                    Some(vec!["https://nvd.nist.gov".to_string()]), // Default reference
+                    Some(false), // Default actively exploited status
                     Some(true), // If we have a pattern, exploit is likely available
-                    Some(pattern.mitigation.to_string()),
-                    Some(categorize_vulnerability(pattern.id)),
+                    Some("Update the affected software".to_string()), // Default mitigation
+                    Some(categorize_vulnerability(&pattern.2)), // Category based on pattern id
                     None, // No CWE-ID for offline patterns
                     Some(determine_attack_vector(service, banner)),
                     None, // No MITRE tactics for offline patterns
@@ -87,7 +87,7 @@ pub fn match_offline_vulnerabilities(service: &str, banner: &str) -> Vec<Vulnera
 }
 
 /// Check for vulnerabilities in known services based on banner information
-pub fn check_known_service_vulnerabilities(service: &str, banner: &str, results: &mut Vec<Vulnerability>) {
+pub fn check_known_service_vulnerabilities(_service: &str, banner: &str, results: &mut Vec<Vulnerability>) {
     // This is a simplified example; real implementation would be more comprehensive
     let product_regexes = [
         (r"Apache/(\d+\.\d+\.\d+)", "apache_http_server"),

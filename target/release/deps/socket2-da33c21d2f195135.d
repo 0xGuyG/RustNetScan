@@ -1,0 +1,11 @@
+/Users/guygandelman/Documents/GitHub/RustNetScan/target/release/deps/libsocket2-da33c21d2f195135.rmeta: /Users/guygandelman/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/socket2-0.5.8/src/lib.rs /Users/guygandelman/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/socket2-0.5.8/src/sockaddr.rs /Users/guygandelman/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/socket2-0.5.8/src/socket.rs /Users/guygandelman/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/socket2-0.5.8/src/sockref.rs /Users/guygandelman/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/socket2-0.5.8/src/sys/unix.rs
+
+/Users/guygandelman/Documents/GitHub/RustNetScan/target/release/deps/libsocket2-da33c21d2f195135.rlib: /Users/guygandelman/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/socket2-0.5.8/src/lib.rs /Users/guygandelman/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/socket2-0.5.8/src/sockaddr.rs /Users/guygandelman/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/socket2-0.5.8/src/socket.rs /Users/guygandelman/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/socket2-0.5.8/src/sockref.rs /Users/guygandelman/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/socket2-0.5.8/src/sys/unix.rs
+
+/Users/guygandelman/Documents/GitHub/RustNetScan/target/release/deps/socket2-da33c21d2f195135.d: /Users/guygandelman/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/socket2-0.5.8/src/lib.rs /Users/guygandelman/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/socket2-0.5.8/src/sockaddr.rs /Users/guygandelman/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/socket2-0.5.8/src/socket.rs /Users/guygandelman/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/socket2-0.5.8/src/sockref.rs /Users/guygandelman/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/socket2-0.5.8/src/sys/unix.rs
+
+/Users/guygandelman/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/socket2-0.5.8/src/lib.rs:
+/Users/guygandelman/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/socket2-0.5.8/src/sockaddr.rs:
+/Users/guygandelman/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/socket2-0.5.8/src/socket.rs:
+/Users/guygandelman/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/socket2-0.5.8/src/sockref.rs:
+/Users/guygandelman/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/socket2-0.5.8/src/sys/unix.rs:

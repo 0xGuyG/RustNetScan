@@ -48,7 +48,7 @@ pub fn check_exploit_db(cve_id: &str) -> Result<Option<Vec<String>>, Box<dyn Err
 }
 
 /// Check for Metasploit exploits
-fn check_metasploit_exploits(cve_id: &str) -> Result<Option<Vec<String>>, Box<dyn Error>> {
+fn check_metasploit_exploits(_cve_id: &str) -> Result<Option<Vec<String>>, Box<dyn Error>> {
     // This is a simplified implementation - in a real-world scenario, 
     // we would query Metasploit's database or a public API
     
@@ -93,12 +93,15 @@ pub fn check_active_exploitation(cve_id: &str) -> Result<bool, Box<dyn Error>> {
 /// Map a CVE to MITRE ATT&CK tactics and techniques
 pub fn map_to_mitre_attack(cve_id: &str) -> Result<(Option<Vec<String>>, Option<Vec<String>>), Box<dyn Error>> {
     // Check if we have a direct mapping in our constants
-    for mapping in MITRE_ATTACK_MAPPINGS {
-        if mapping.cve_pattern.is_empty() || cve_id.contains(mapping.cve_pattern) {
-            return Ok((
-                Some(mapping.tactics.split(',').map(String::from).collect()),
-                Some(mapping.techniques.split(',').map(String::from).collect())
-            ));
+    for (cve_pattern, tactics_techniques) in MITRE_ATTACK_MAPPINGS.iter() {
+        if cve_pattern.is_empty() || cve_id.contains(cve_pattern) {
+            // Get the tactics and techniques
+            if let Some(tactics_techniques_vec) = tactics_techniques.get(0) {
+                return Ok((
+                    Some(vec![tactics_techniques_vec.clone()]),
+                    Some(tactics_techniques.clone())
+                ));
+            }
         }
     }
     
