@@ -1,18 +1,18 @@
 // Author: CyberCraft Alchemist
 // Command-line interface for the network vulnerability scanner
 
-use clap::{App, Arg, ArgMatches};
+use clap::App;
+use clap::Arg;
+use clap::ArgMatches;
 use colored::*;
 use std::time::Instant;
 use chrono::Local;
 
-use rustnet_scan::{
-    models::{ScanConfig},
-    constants,
-    cveapi,
-    report,
-    scanner,
-};
+use rustnet_scan::models::ScanConfig;
+use rustnet_scan::constants;
+use rustnet_scan::cveapi;
+use rustnet_scan::report;
+use rustnet_scan::scanner;
 
 #[cfg(not(debug_assertions))]
 const DEFAULT_THREADS: &str = "50";
@@ -196,6 +196,12 @@ fn build_config(matches: &ArgMatches) -> Result<ScanConfig, String> {
         offline_mode: matches.is_present("offline"),
         output_format,
         scan_offline_hosts: matches.is_present("scan-offline"),
+        enhanced_vuln_detection: true,
+        assess_attack_surface: true,
+        check_misconfigurations: true,
+        check_default_credentials: true,
+        mitre_mapping: true,
+        attack_path_analysis: true,
     };
     
     Ok(config)

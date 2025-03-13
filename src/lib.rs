@@ -11,12 +11,14 @@ pub mod utils;
 pub mod report;
 pub mod resolver;
 pub mod cveapi;
+pub mod plugins;
 
 // Re-exports for convenience
 pub use models::{ScanConfig, ScanResult, Vulnerability, PortResult, HostInfo};
 pub use constants::{VERSION, TOOL_NAME};
 pub use scanner::{scan_port_range, quick_scan, ot_scan, check_vulnerability, discover_hosts};
 pub use scanner as scanner_module;
+pub use plugins::{VulnerabilityDetectorPlugin, PluginRegistry};
 
 // Function to get version
 pub fn version() -> &'static str {
@@ -37,6 +39,9 @@ pub fn banner() -> String {
 pub fn init() {
     // Initialize CVE cache
     cveapi::init_cve_cache();
+    
+    // Initialize plugin registry
+    let _plugin_registry = plugins::PluginRegistry::new();
 }
 
 // Utility functions that use components from different modules
