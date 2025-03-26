@@ -20,14 +20,49 @@ else
     echo "❌ macOS build failed"
 fi
 
-# 2. Build for Windows
-echo "=== Building for Windows ==="
-cargo build --release --target x86_64-pc-windows-msvc
-if [ $? -eq 0 ]; then
-    cp "$BUILD_DIR/../x86_64-pc-windows-msvc/release/rustnet_scan.exe" "$OUTPUT_DIR/rustnet_scan-windows.exe"
-    echo "✅ Windows build successful: $OUTPUT_DIR/rustnet_scan-windows.exe"
+# 2. Build for Windows (using GNU toolchain)
+echo "=== Building for Windows (GNU toolchain) ==="
+WINDOWS_EXE="$OUTPUT_DIR/rustnet_scan-windows.exe"
+WINDOWS_BUILD_SUCCESS=0
+
+# Check if we already have a Windows executable from previous builds
+if [ -f "$WINDOWS_EXE" ]; then
+    EXISTING_WIN_EXE_TIME=$(stat -f "%m" "$WINDOWS_EXE")
+    echo "Found existing Windows executable (last modified: $(date -r $EXISTING_WIN_EXE_TIME))"
+fi
+
+# Check if mingw32 is installed
+if ! command -v x86_64-w64-mingw32-gcc &> /dev/null; then
+    echo "\033[33m⚠️ MinGW toolchain (x86_64-w64-mingw32-gcc) not found. You can install it with 'brew install mingw-w64'\033[0m"
+    if [ -f "$WINDOWS_EXE" ]; then
+        echo "\033[33m⚠️ Using existing Windows executable from previous successful build\033[0m"
+        echo "   Path: $WINDOWS_EXE"
+        echo "   Date: $(date -r $EXISTING_WIN_EXE_TIME)"
+        WINDOWS_BUILD_SUCCESS=1
+    fi
 else
-    echo "❌ Windows build failed"
+    # Attempt to build for Windows with GNU toolchain
+    cargo build --release --target x86_64-pc-windows-gnu
+    if [ $? -eq 0 ]; then
+        cp "$BUILD_DIR/../x86_64-pc-windows-gnu/release/rustnet_scan.exe" "$WINDOWS_EXE"
+        echo "✅ Windows build successful: $WINDOWS_EXE"
+        WINDOWS_BUILD_SUCCESS=1
+    else
+        echo "❌ Windows build failed with GNU toolchain"
+        
+        # If cross-compilation failed but we have an existing executable, keep it
+        if [ -f "$WINDOWS_EXE" ]; then
+            echo "\033[33m⚠️ Using existing Windows executable from previous successful build\033[0m"
+            echo "   Path: $WINDOWS_EXE"
+            echo "   Date: $(date -r $EXISTING_WIN_EXE_TIME)"
+            WINDOWS_BUILD_SUCCESS=1
+        fi
+    fi
+fi
+
+# Only if Windows build completely failed (no existing executable either)
+if [ $WINDOWS_BUILD_SUCCESS -eq 0 ]; then
+    echo "\033[33m⚠️ No Windows executable available. Build will need to be performed on Windows.\033[0m"
 fi
 
 # 3. Build for Linux (compatible with Kali Linux)

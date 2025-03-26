@@ -6,6 +6,7 @@ use std::sync::{Arc, Mutex};
 use std::time::Instant;
 use rayon::prelude::*;
 use chrono::Local;
+use colored::*;
 
 use crate::models::{ScanConfig, ScanResult, PortResult, Vulnerability, HostInfo};
 use crate::utils;
@@ -21,9 +22,22 @@ pub fn scan(config: ScanConfig) -> Vec<ScanResult> {
     // Resolve targets to IP addresses
     let mut targets = resolve_targets(&config);
     
+    if config.verbose {
+        println!("{} Resolved {} targets", "[INFO]".cyan().bold(), targets.len());
+        for (i, target) in targets.iter().enumerate().take(10) {
+            println!("       Target {}: {}", i+1, target);
+        }
+        if targets.len() > 10 {
+            println!("       ... and {} more", targets.len() - 10);
+        }
+    }
+    
     // Randomize targets if requested
     if config.randomize_scan {
         utils::randomize_hosts(&mut targets);
+        if config.verbose {
+            println!("{} Randomized scan order", "[INFO]".cyan().bold());
+        }
     }
     
     // Create a thread-safe container for results
@@ -51,13 +65,36 @@ pub fn scan(config: ScanConfig) -> Vec<ScanResult> {
 
 /// Scan a single host for open ports and vulnerabilities
 fn scan_host(ip: &IpAddr, config: &ScanConfig) -> ScanResult {
-    let _start_time = Instant::now();
+    let start_time = Instant::now();
+    
+    if config.verbose {
+        println!("{} Scanning host: {} ({})", "[SCAN]".yellow().bold(), ip, Local::now().format("%H:%M:%S"));
+    }
     
     // Resolve hostname
     let hostname = resolver::resolve_hostname_comprehensive(ip);
     
+    if config.verbose && !hostname.is_empty() {
+        println!("       Hostname: {}", hostname);
+    }
+    
     // Ping host to check if it's online
-    let is_online = utils::ping_host(ip) || utils::tcp_ping_host(ip, config.timeout_ms);
+    let ping_result = utils::ping_host(ip);
+    let tcp_ping_result = if !ping_result { utils::tcp_ping_host(ip, config.timeout_ms) } else { false };
+    let is_online = ping_result || tcp_ping_result;
+    
+    if config.verbose {
+        if is_online {
+            println!("       Host status: {}", "Online".green());
+            if ping_result {
+                println!("       Response method: ICMP ping");
+            } else if tcp_ping_result {
+                println!("       Response method: TCP ping");
+            }
+        } else {
+            println!("       Host status: {}", "Offline".red());
+        }
+    }
     
     // If host is not online and we're not doing a complete scan, return early
     if !is_online && !config.scan_offline_hosts {
@@ -76,8 +113,15 @@ fn scan_host(ip: &IpAddr, config: &ScanConfig) -> ScanResult {
     // Determine which ports to scan
     let ports_to_scan: Vec<u16> = if config.ports.is_empty() {
         // If no ports are specified, scan common ports
-        constants::COMMON_PORTS.keys().cloned().collect()
+        let ports = constants::COMMON_PORTS.keys().cloned().collect();
+        if config.verbose {
+            println!("       Scanning {} common ports", constants::COMMON_PORTS.len());
+        }
+        ports
     } else {
+        if config.verbose {
+            println!("       Scanning {} specific ports", config.ports.len());
+        }
         config.ports.clone()
     };
     
@@ -85,6 +129,9 @@ fn scan_host(ip: &IpAddr, config: &ScanConfig) -> ScanResult {
     let mut ports = ports_to_scan.clone();
     if config.randomize_scan {
         utils::randomize_ports(&mut ports);
+        if config.verbose {
+            println!("       Randomized port scan order");
+        }
     }
     
     // Container for open port results
@@ -92,20 +139,43 @@ fn scan_host(ip: &IpAddr, config: &ScanConfig) -> ScanResult {
     
     // Scan ports in parallel
     ports.par_iter().for_each(|port| {
+        let port_start_time = Instant::now();
+        if config.verbose {
+            println!("       Scanning port {} on {}", port, ip);
+        }
+        
         if utils::is_port_open(ip, *port, config.timeout_ms) {
+            if config.verbose {
+                println!("       Port {}: {}", port, "OPEN".green().bold());
+            }
             // Get service banner
             let banner = utils::get_service_banner(ip, *port, config.timeout_ms)
                 .unwrap_or_else(|| String::from("No banner"));
             
+            if config.verbose {
+                println!("       Banner: {}", if banner == "No banner" { "<none>" } else { &banner });
+            }
+            
             // Identify service
             let service = utils::identify_service(*port, &banner);
+            
+            if config.verbose {
+                println!("       Service identified: {}", service);
+            }
             
             // Create plugin registry
             let plugin_registry = PluginRegistry::new();
             
             // Detect vulnerabilities using the appropriate method based on configuration
+            if config.verbose {
+                println!("       Checking vulnerabilities for {} on port {}", service, port);
+            }
+            
             let vulnerabilities = if config.enhanced_vuln_detection {
                 // If enhanced vulnerability detection is enabled, use all plugins
+                if config.verbose {
+                    println!("       Using enhanced vulnerability detection");
+                }
                 plugin_registry.detect_vulnerabilities(
                     &service,
                     &banner,
@@ -113,12 +183,34 @@ fn scan_host(ip: &IpAddr, config: &ScanConfig) -> ScanResult {
                 )
             } else {
                 // Otherwise use the legacy approach for backward compatibility
+                if config.verbose {
+                    println!("       Using standard vulnerability detection");
+                }
                 cveapi::check_service_vulnerabilities(
                     &service, 
                     &banner, 
                     !config.offline_mode
                 )
             };
+            
+            if config.verbose && !vulnerabilities.is_empty() {
+                println!("       Found {} vulnerabilities for {} on port {}", 
+                    vulnerabilities.len().to_string().red().bold(), 
+                    service, 
+                    port);
+                    
+                for (i, vuln) in vulnerabilities.iter().enumerate() {
+                    let cvss_display = match vuln.cvss_score {
+                        Some(score) => format!("{:.1}", score),
+                        None => "N/A".to_string()
+                    };
+                    println!("         {}. {} - {} (CVSS: {})", 
+                        i+1, 
+                        vuln.id, 
+                        vuln.description, 
+                        cvss_display);
+                }
+            }
             
             // Create port result
             let port_result = PortResult {
@@ -131,6 +223,13 @@ fn scan_host(ip: &IpAddr, config: &ScanConfig) -> ScanResult {
             // Add to results
             let mut open_ports_guard = open_ports.lock().unwrap();
             open_ports_guard.push(port_result);
+            
+            if config.verbose {
+                let port_duration = port_start_time.elapsed();
+                println!("       Port {} scan completed in {:.2}ms", port, port_duration.as_millis());
+            }
+        } else if config.verbose {
+            println!("       Port {}: {}", port, "CLOSED".red());
         }
     });
     
@@ -139,6 +238,10 @@ fn scan_host(ip: &IpAddr, config: &ScanConfig) -> ScanResult {
         .unwrap()
         .into_inner()
         .unwrap();
+    
+    if config.verbose {
+        println!("       Found {} open ports on host {}", open_port_results.len(), ip);
+    }
     
     // Sort ports for better readability
     open_port_results.sort_by_key(|p| p.port);
@@ -178,6 +281,17 @@ fn scan_host(ip: &IpAddr, config: &ScanConfig) -> ScanResult {
         None
     };
     
+    // Calculate total scan time for host
+    let scan_duration = start_time.elapsed();
+    
+    if config.verbose {
+        println!("{} Host {} scan completed in {:.2}s", 
+            "[DONE]".green().bold(), 
+            ip, 
+            scan_duration.as_secs_f64());
+        println!("{}", "---------------------------------------".dimmed());
+    }
+    
     // Create final result
     ScanResult {
         host: ip.to_string(),
@@ -193,7 +307,14 @@ fn scan_host(ip: &IpAddr, config: &ScanConfig) -> ScanResult {
 
 /// Resolve a target specification to a list of IPs
 fn resolve_targets(config: &ScanConfig) -> Vec<IpAddr> {
-    resolver::resolve_targets(&config.target)
+    if config.verbose {
+        println!("{} Resolving target: {}", "[INFO]".cyan().bold(), config.target);
+    }
+    let results = resolver::resolve_targets(&config.target);
+    if config.verbose {
+        println!("{} Resolved {} IP addresses", "[INFO]".cyan().bold(), results.len());
+    }
+    results
 }
 
 /// Scan a specific port range on a target
